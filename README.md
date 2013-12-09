@@ -4,7 +4,7 @@ jQuery-scale
 This jQuery plugin adds scaling and specifying the origin of
 transforms. It is based on jquery-rotate by Jakub Jankiewicz.
 
-## Functions
+### Functions
 
   * jQuery(<element>).css('scale') Return the scale transform of an
     element
@@ -14,7 +14,7 @@ transforms. It is based on jquery-rotate by Jakub Jankiewicz.
   * jQuery(<element>).css('origin', value) Set the transform
     origin of an element
 
-## Values
+### Values
 
 The scale value is a floating point number. The transform value can be
 set in px or %: jQuery(<element>).css('origin', '0px 50%'). One, two
