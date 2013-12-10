@@ -25,7 +25,7 @@
             if (property) {
                 return elem.style[property].replace(/.*scale\((.*)\).*/, '$1');
             } else {
-                return '';
+                return 1;
             }
         },
         set: function(elem, value){
