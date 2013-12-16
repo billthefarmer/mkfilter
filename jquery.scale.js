@@ -19,6 +19,7 @@
         }
         return false;
     }
+    $.cssNumber['scale'] = true;
     $.cssHooks['scale'] = {
         get: function(elem, computed, extra) {
             var property = getTransformProperty(elem);
@@ -31,7 +32,6 @@
         set: function(elem, value){
             var property = getTransformProperty(elem);
             if (property) {
-                value = parseFloat(value);
                 if (value == 0) {
                     elem.style[property] = '';
                 } else {
