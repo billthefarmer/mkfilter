@@ -1,28 +1,20 @@
-jQuery-scale
-============
+# Mkfilter
 
-This jQuery plugin adds scaling and specifying the origin of
-transforms. It is based on jquery-rotate by Jakub Jankiewicz.
+This is the mkfilter code from
+https://github.com/university-of-york/cs-www-users-fisher slightly
+hacked so it will compile with the more pernickety up to date Gnu C++
+compiler.
 
-### Scale
-#### .css('scale')
-Return the scale transform of an element
+## Examples
+    mkfilter -Bu -Lp -o 4 -a 0.2
+Generate a 4-pole Butterworth lowpass filter with corner frequency 0.2 fs;
+display pole & zero positions and filter recurrence relation
+    mkfilter -Bu -Lp -o 4 -a 0.2 -l | gencode
+Generate C code for the above filter
+    mkfilter -Bu -Lp -o 4 -a 0.2 -l | genplot graph.gif
+Generate phase & magnitude graphs for the above filter
+    mkfilter -Re 1000 -Bp -a 0.3
+Generate a bandpass resonator with Q = 1000 and centre frequency 0.3 fs;
+display pole & zero positions and filter recurrence relation
 
-#### .css('scale', value)
-Set the scale of an element
-
-#### .animate({scale: value},...)
-Animate the scale of an element
-
-### Transform origin
-#### .css('origin')
-Return the transform origin of an element
-
-#### .css('origin', value)
-Set the transform origin of an element
-
-### Values
-
-The scale value is a floating point number. The transform value can be
-set in px or %: .css('origin', '0px 50%'). One, two or three values
-may be set. Three values are returned.
+See doc.pdf for original documentation.
