@@ -20,4 +20,5 @@ Generate phase & magnitude graphs for the above filter
 Generate a bandpass resonator with Q = 1000 and centre frequency 0.3 fs;
 display pole & zero positions and filter recurrence relation
 
-See doc.pdf for original documentation.
+
+See `doc.pdf` for original documentation.
