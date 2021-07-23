@@ -1,8 +1,8 @@
-/* genplot - use "-l" output from mkfilter to generate .gif mag/phase plots
+/* genplot - use "-l" output from mkfilter to generate .png mag/phase plots
    A.J. Fisher, University of York   <fisher@minster.york.ac.uk>
    April 1995 */
 
-/* Uses the "gd" gif manipulation library, originally from
+/* Uses the "gd" png manipulation library, originally from
    Quest Protein Database Center, and now available from:
    http://www.boutell.com/gd
 */
@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <new.h>
+#include <new>
 
 extern "C" {
    #include <gd.h>
@@ -61,8 +61,8 @@ static void newhandler();
 static void giveup(char*, word = 0);
 
 
-global void main(int argc, char *argv[])
-  { set_new_handler(newhandler);
+global int main(int argc, char *argv[])
+{ std::set_new_handler(newhandler);
     readcmdline(argv);
     char junkv[MAXSTRING+1]; double junkd;
     readdata(junkv, junkd, nzeros, xcoeffs, npoles, ycoeffs);
@@ -115,7 +115,7 @@ static int getiarg(char *s)
 
 static void usage()
   { fprintf(stderr, "Genplot V.%s from <fisher@minster.york.ac.uk>\n", VERSION);
-    fprintf(stderr, "Usage: genplot [-i <n> | -s <n> -a <a1> <a2> | -l] [-log <min>] [-d] out.gif\n");
+    fprintf(stderr, "Usage: genplot [-i <n> | -s <n> -a <a1> <a2> | -l] [-log <min>] [-d] out.png\n");
     exit(1);
   }
 
@@ -225,7 +225,7 @@ static void locusgraph(char *fn, complex fr[], int nsteps, double &stepl)
       }
     FILE *fi = fopen(fn, "wb");
     if (fi == NULL) giveup("can't create %s", fn);
-    gdImageGif(im, fi);
+    gdImagePng(im, fi);
     fclose(fi);
     gdImageDestroy(im);
   }
@@ -285,7 +285,7 @@ static void frgraph(char *fn, complex fr[], int nsteps)
       }
     FILE *fi = fopen(fn, "wb");
     if (fi == NULL) giveup("can't create %s", fn);
-    gdImageGif(im, fi);
+    gdImagePng(im, fi);
     fclose(fi);
     gdImageDestroy(im);
     delete ymvals; delete ypvals;
@@ -310,7 +310,7 @@ static void irgraph(char *fn, double ir[], int nsteps)
       }
     FILE *fi = fopen(fn, "wb");
     if (fi == NULL) giveup("can't create %s", fn);
-    gdImageGif(im, fi);
+    gdImagePng(im, fi);
     fclose(fi);
     gdImageDestroy(im);
     delete ymvals;
