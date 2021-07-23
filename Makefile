@@ -14,7 +14,7 @@ genplot:	genplot.o complex.o readdata.o
 			-L /c/msys64/mingw64/lib
 
 %.o:		%.C mkfilter.h complex.h Makefile
-		g++ -O -fpermissive -Wall -c $< -I /c/msys64/mingw64/include
+		g++ -g -std=gnu++98 -fpermissive -Wall -c $< -I /c/msys64/mingw64/include
 
 clean:
 		rm -f mkfilter.o mkshape.o mkaverage.o gencode.o genplot.o complex.o readdata.o
