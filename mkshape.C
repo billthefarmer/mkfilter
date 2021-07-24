@@ -35,7 +35,7 @@ static void fft(complex*, complex*, int);
 static void giveup(char*, int = 0);
 
 
-global void main(int argc, char **argv)
+global int main(int argc, char **argv)
   { readcmdline(argv);
     if (options & opt_l)
       { computefilter();
