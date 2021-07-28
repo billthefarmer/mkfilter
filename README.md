@@ -3,7 +3,7 @@
 This is the mkfilter code from
 https://github.com/university-of-york/cs-www-users-fisher slightly
 hacked so it will compile with the more pernickety up to date Gnu C++
-compiler.
+compiler and produce `.png` plot files.
 
 ## Examples
 
@@ -14,11 +14,11 @@ display pole & zero positions and filter recurrence relation
     mkfilter -Bu -Lp -o 4 -a 0.2 -l | gencode
 Generate C code for the above filter
 
-    mkfilter -Bu -Lp -o 4 -a 0.2 -l | genplot graph.gif
+    mkfilter -Bu -Lp -o 4 -a 0.2 -l | genplot graph.png
 Generate phase & magnitude graphs for the above filter
 
     mkfilter -Re 1000 -Bp -a 0.3
 Generate a bandpass resonator with Q = 1000 and centre frequency 0.3 fs;
 display pole & zero positions and filter recurrence relation
 
-See `doc.pdf` for original documentation.
+See [doc.pdf](doc.pdf) for original documentation.
