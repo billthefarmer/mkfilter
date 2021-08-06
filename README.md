@@ -11,6 +11,47 @@ compiler and produce `.png` plot files.
 Generate a 4-pole Butterworth lowpass filter with corner frequency 0.2 fs;
 display pole & zero positions and filter recurrence relation
 
+```
+Command line: ./mkfilter -Bu -Lp -o 4 -a 0.2
+raw alpha1    =   0.2000000000
+raw alpha2    =   0.2000000000
+warped alpha1 =   0.2312656694
+warped alpha2 =   0.2312656694
+gain at dc    :   mag = 2.146710182e+01   phase =   0.0000000000 pi
+gain at centre:   mag = 1.517953327e+01   phase =  -1.0000000000 pi
+gain at hf    :   mag = 0.000000000e+00
+
+S-plane zeros:
+
+S-plane poles:
+         -0.5560715768 + j   1.3424755422
+         -1.3424755422 + j   0.5560715768
+         -1.3424755422 + j  -0.5560715768
+         -0.5560715768 + j  -1.3424755422
+
+Z-plane zeros:
+         -1.0000000000 + j   0.0000000000       4 times
+
+Z-plane poles:
+          0.2265597603 + j   0.6442020225
+          0.1644878387 + j   0.1937302399
+          0.1644878387 + j  -0.1937302399
+          0.2265597603 + j  -0.6442020225
+
+Recurrence relation:
+y[n] = (  1 * x[n- 4])
+     + (  4 * x[n- 3])
+     + (  6 * x[n- 2])
+     + (  4 * x[n- 1])
+     + (  1 * x[n- 0])
+
+     + ( -0.0301188750 * y[n- 4])
+     + (  0.1826756978 * y[n- 3])
+     + ( -0.6799785269 * y[n- 2])
+     + (  0.7820951980 * y[n- 1])
+
+```
+
     mkfilter -Bu -Lp -o 4 -a 0.2 -l | gencode
 Generate C code for the above filter
 
