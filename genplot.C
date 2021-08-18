@@ -1,8 +1,8 @@
-/* genplot - use "-l" output from mkfilter to generate .gif mag/phase plots
+/* genplot - use "-l" output from mkfilter to generate .png mag/phase plots
    A.J. Fisher, University of York   <fisher@minster.york.ac.uk>
    April 1995 */
 
-/* Uses the "gd" gif manipulation library, originally from
+/* Uses the "gd" png manipulation library, originally from
    Quest Protein Database Center, and now available from:
    http://www.boutell.com/gd
 */
@@ -13,8 +13,8 @@
 #include <new>
 
 extern "C" {
-#include <gd.h>
-#include <gdfonts.h>
+   #include <gd.h>
+   #include <gdfonts.h>
 };
 
 #include "mkfilter.h"
@@ -137,7 +137,7 @@ static int getiarg(char *s)
 static void usage()
 {
     fprintf(stderr, "Genplot V.%s from <fisher@minster.york.ac.uk>\n", VERSION);
-    fprintf(stderr, "Usage: genplot [-i <n> | -s <n> -a <a1> <a2> | -l] [-log <min>] [-d] out.gif\n");
+    fprintf(stderr, "Usage: genplot [-i <n> | -s <n> -a <a1> <a2> | -l] [-log <min>] [-d] out.png\n");
     exit(1);
 }
 
@@ -251,22 +251,24 @@ static void computeir(double ir[], int nsteps, bool stp)
 static void locusgraph(char *fn, complex fr[], int nsteps, double &stepl)
 {
     stepl = 0.0;
-    gdImagePtr im = gdImageCreate(XYPIXELS + 2 * BORDER, XYPIXELS + 2 * BORDER);
-    gdImageColorAllocate(im, 255, 255, 255); /* white background */
+    gdImagePtr im = gdImageCreateTrueColor(XYPIXELS + 2 * BORDER, XYPIXELS + 2 * BORDER);
+    int white = gdImageColorAllocate(im, 255, 255, 255); /* white background */
     int red = gdImageColorAllocate(im, 255, 0, 0);
     int black = gdImageColorAllocate(im, 0, 0, 0);
+    gdImageFilledRectangle(im, 0, 0, XYPIXELS + 2*BORDER, XYPIXELS + 2*BORDER, white);
     gdImageLine(im, xmap_lc(-1.0), ymap_lc(0.0), xmap_lc(+1.0), ymap_lc(0.0), black); /* X axis	 */
     gdImageLine(im, xmap_lc(0.0), ymap_lc(-1.0), xmap_lc(0.0), ymap_lc(+1.0), black); /* Y axis	 */
+    gdImageSetAntiAliased(im, red);
     for (int i = 1; i <= nsteps; i++)
     {
         complex z0 = fr[i - 1], z1 = fr[i];
-        gdImageLine(im, xmap_lc(z0.re), ymap_lc(z0.im), xmap_lc(z1.re), ymap_lc(z1.im), red);
+        gdImageLine(im, xmap_lc(z0.re), ymap_lc(z0.im), xmap_lc(z1.re), ymap_lc(z1.im), gdAntiAliased);
         double sl = hypot(z1 - z0);
         if (sl > stepl) stepl = sl;
     }
     FILE *fi = fopen(fn, "wb");
     if (fi == NULL) giveup("can't create %s", fn);
-    gdImageGif(im, fi);
+    gdImagePng(im, fi);
     fclose(fi);
     gdImageDestroy(im);
 }
@@ -286,8 +288,8 @@ static void frgraph(char *fn, complex fr[], int nsteps)
     double *ymvals = new double[nsteps + 1], *ypvals = new double[nsteps + 1];
     int i;
     char *fmt;
-    gdImagePtr im = gdImageCreate(XYPIXELS + 2 * BORDER, XYPIXELS + 2 * BORDER);
-    gdImageColorAllocate(im, 255, 255, 255); /* white background */
+    gdImagePtr im = gdImageCreateTrueColor(XYPIXELS + 2 * BORDER, XYPIXELS + 2 * BORDER);
+    int white = gdImageColorAllocate(im, 255, 255, 255); /* white background */
     int red = gdImageColorAllocate(im, 255, 0, 0);
     int blue = gdImageColorAllocate(im, 0, 0, 255);
     int black = gdImageColorAllocate(im, 0, 0, 0);
@@ -297,6 +299,7 @@ static void frgraph(char *fn, complex fr[], int nsteps)
         sprintf(str, "FILTER DELAY: %g SAMPLES.", 0.5 * nzeros);
         gdImageString(im, gdFontSmall, 20, 10, str, black);
     }
+    gdImageFilledRectangle(im, 0, 0, XYPIXELS + 2*BORDER, XYPIXELS + 2*BORDER, white);
     gdImageLine(im, xmap_pm(0.0), ymap_pm(0.0), xmap_pm(1.0), ymap_pm(0.0), black); /* X axis	    */
     gdImageLine(im, xmap_pm(0.0), ymap_pm(0.0), xmap_pm(0.0), ymap_pm(1.0), black); /* left Y axis  */
     gdImageLine(im, xmap_pm(1.0), ymap_pm(0.0), xmap_pm(1.0), ymap_pm(1.0), black); /* right Y axis */
@@ -313,16 +316,19 @@ static void frgraph(char *fn, complex fr[], int nsteps)
             ymvals[i] = (ymvals[i] > 0.0) ? (20.0 * log10(ymvals[i]) - logmin) / (-logmin) :
                         -1.0; /* out-of-range value will not be plotted */
     }
-    pgraph(im, ymvals, nsteps, red, false);    /* mag graph   */
-    pgraph(im, ypvals, nsteps, blue, true);    /* phase graph */
+    gdImageSetAntiAliased(im, red);
+    pgraph(im, ymvals, nsteps, gdAntiAliased, false);    /* mag graph   */
+    gdImageSetAntiAliased(im, blue);
+    pgraph(im, ypvals, nsteps, gdAntiAliased, true);     /* phase graph */
+    gdImageSetAntiAliased(im, red);
     if (logopt)
     {
         fmt = choosefmt(logmin, 0.0);
-        for (i = 0; i <= 10; i++) draw_ytick(im, 0.0, 0.1 * i, red, -TICKLEN, fmt, (1.0 - 0.1 * i) * logmin);
+        for (i = 0; i <= 10; i++) draw_ytick(im, 0.0, 0.1 * i, gdAntiAliased, -TICKLEN, fmt, (1.0 - 0.1 * i) * logmin);
     }
     else
     {
-        for (i = 0; i <= 10; i++) draw_ytick(im, 0.0, 0.1 * i, red, -TICKLEN, "%3.1f", 0.1 * i);
+        for (i = 0; i <= 10; i++) draw_ytick(im, 0.0, 0.1 * i, gdAntiAliased, -TICKLEN, "%3.1f", 0.1 * i);
     }
     draw_ytick(im, 1.0, 0.0, blue, TICKLEN, "-pi");
     draw_ytick(im, 1.0, 0.5, blue, TICKLEN, "0");
@@ -337,7 +343,7 @@ static void frgraph(char *fn, complex fr[], int nsteps)
     }
     FILE *fi = fopen(fn, "wb");
     if (fi == NULL) giveup("can't create %s", fn);
-    gdImageGif(im, fi);
+    gdImagePng(im, fi);
     fclose(fi);
     gdImageDestroy(im);
     delete ymvals;
@@ -348,17 +354,19 @@ static void irgraph(char *fn, double ir[], int nsteps)
 {
     double *ymvals = new double[nsteps + 1];
     int i;
-    gdImagePtr im = gdImageCreate(XYPIXELS + 2 * BORDER, XYPIXELS + 2 * BORDER);
-    gdImageColorAllocate(im, 255, 255, 255); /* white background */
+    gdImagePtr im = gdImageCreateTrueColor(XYPIXELS + 2 * BORDER, XYPIXELS + 2 * BORDER);
+    int white = gdImageColorAllocate(im, 255, 255, 255); /* white background */
     int red = gdImageColorAllocate(im, 255, 0, 0);
     int black = gdImageColorAllocate(im, 0, 0, 0);
+    gdImageFilledRectangle(im, 0, 0, XYPIXELS + 2*BORDER, XYPIXELS + 2*BORDER, white);
     gdImageLine(im, xmap_pm(0.0), ymap_pm(0.0), xmap_pm(1.0), ymap_pm(0.0), black); /* X axis	    */
     gdImageLine(im, xmap_pm(0.0), ymap_pm(0.0), xmap_pm(0.0), ymap_pm(1.0), black); /* left Y axis  */
     gdImageLine(im, xmap_pm(1.0), ymap_pm(0.0), xmap_pm(1.0), ymap_pm(1.0), black); /* right Y axis */
     for (i = 0; i <= nsteps; i++) ymvals[i] = 0.5 * (ir[i] + 1.0);
     /* ymvals in range 0 .. 1 */
-    pgraph(im, ymvals, nsteps, red, false);
-    for (i = 0; i <= 10; i++) draw_ytick(im, 0.0, 0.1 * i, red, -TICKLEN, "%3.1f", 0.2 * (i - 5));
+    gdImageSetAntiAliased(im, red);
+    pgraph(im, ymvals, nsteps, gdAntiAliased, false);
+    for (i = 0; i <= 10; i++) draw_ytick(im, 0.0, 0.1 * i, gdAntiAliased, -TICKLEN, "%3.1f", 0.2 * (i - 5));
     for (i = 0; i <= 10; i++)
     {
         double x = (double) nsteps * (double) i / 10.0;
@@ -366,7 +374,7 @@ static void irgraph(char *fn, double ir[], int nsteps)
     }
     FILE *fi = fopen(fn, "wb");
     if (fi == NULL) giveup("can't create %s", fn);
-    gdImageGif(im, fi);
+    gdImagePng(im, fi);
     fclose(fi);
     gdImageDestroy(im);
     delete ymvals;
